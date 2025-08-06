@@ -1,6 +1,6 @@
 import { getOptions } from "./header";
 
-const BASE_URL = 'https://cf816022d4fe.ngrok-free.app';
+const BASE_URL = 'https://cf816022d4fe.ngrok-free.app/matches';
 export const getLiveMatch = async () => {
     // const url = `${BASE_URL}/cricket-livescores`;
     const url = `${BASE_URL}/live`;
