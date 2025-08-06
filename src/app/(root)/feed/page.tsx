@@ -1,14 +1,13 @@
 "use client"
 import { useState, useRef, useEffect } from 'react'
-import Head from 'next/head'
 import Navbar from '@/app/components/Navbar'
+
 
 export default function CricketSocialFeed() {
     const [activeTab, setActiveTab] = useState('following')
-    const [commentInput, setCommentInput] = useState('')
     const [activePost, setActivePost] = useState(null)
     const [isScrolled, setIsScrolled] = useState(false)
-    const storiesRef = useRef(null)
+    const storiesRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -18,7 +17,7 @@ export default function CricketSocialFeed() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    const scrollStories = (direction) => {
+    const scrollStories = (direction: any) => {
         if (storiesRef.current) {
             storiesRef.current.scrollBy({
                 left: direction === 'right' ? 300 : -300,
@@ -244,7 +243,7 @@ export default function CricketSocialFeed() {
 }
 
 // Enhanced Story Item Component
-function StoryItem({ username, image, live = false, new: isNew = false, verified = false }) {
+function StoryItem({ username, image, live = false, new: isNew = false, verified = false }: { username: string, image: string, live?: boolean, new?: boolean, verified?: boolean }) {
     return (
         <div className="flex items-center space-x-3 cursor-pointer group">
             <div className={`relative ${live ? 'ring-2 ring-blue-500 animate-pulse-slow' : isNew ? 'ring-2 ring-gray-500' : 'ring-1 ring-gray-600'} rounded-full p-0.5 transition-all group-hover:ring-2 group-hover:ring-blue-400`}>
@@ -275,7 +274,7 @@ function StoryItem({ username, image, live = false, new: isNew = false, verified
 }
 
 // Enhanced Post Component with Richer Interactions
-function Post({ username, userImage, time, content, image, video, likes, comments, shares, activePost, setActivePost, id }) {
+function Post({ username, userImage, time, content, image, video, likes, comments, shares, activePost, setActivePost, id }: { username: string, userImage: string, time: string, content: string, image?: string, video?: string, likes: number, comments: number, shares: number, activePost: number | null, setActivePost: any, id: number }) {
     const [isLiked, setIsLiked] = useState(false)
     const [currentLikes, setCurrentLikes] = useState(likes)
     const [isBookmarked, setIsBookmarked] = useState(false)
@@ -296,7 +295,7 @@ function Post({ username, userImage, time, content, image, video, likes, comment
         setIsLiked(!isLiked)
     }
 
-    const formatNumber = (num) => {
+    const formatNumber = (num: number) => {
         if (num >= 1000000) {
             return (num / 1000000).toFixed(1) + 'M'
         } else if (num >= 1000) {
@@ -471,7 +470,7 @@ function Post({ username, userImage, time, content, image, video, likes, comment
 }
 
 // Enhanced Live Match Post Component
-function LiveMatchPost({ team1, team2, score1, score2, status, time }) {
+function LiveMatchPost({ team1, team2, score1, score2, status, time }: { team1: string, team2: string, score1: string, score2: string, status: string, time: string }) {
     return (
         <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border-l-4 border-blue-500 hover:shadow-blue-500/10 transition-all">
             <div className="p-4">
@@ -527,7 +526,7 @@ function LiveMatchPost({ team1, team2, score1, score2, status, time }) {
 }
 
 // Enhanced Comment Component
-function Comment({ username, userImage, time, content, likes }) {
+function Comment({ username, userImage, time, content, likes }: { username: string, userImage: string, time: string, content: string, likes: number }) {
     const [isLiked, setIsLiked] = useState(false)
     const [currentLikes, setCurrentLikes] = useState(likes)
 
@@ -583,7 +582,7 @@ function Comment({ username, userImage, time, content, likes }) {
 }
 
 // Enhanced Trending Item Component
-function TrendingItem({ tag, posts, trend = 'steady' }) {
+function TrendingItem({ tag, posts, trend = 'steady' }: { tag: string, posts: string, trend?: 'up' | 'down' | 'steady' }) {
     const trendIcons = {
         up: (
             <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -625,7 +624,7 @@ function TrendingItem({ tag, posts, trend = 'steady' }) {
 }
 
 // Enhanced Live Match Item Component
-function LiveMatchItem({ team1, team2, score1, score2, overs }) {
+function LiveMatchItem({ team1, team2, score1, score2, overs }: { team1: string, team2: string, score1: string, score2: string, overs: string }) {
     return (
         <div className="bg-gray-700/50 backdrop-blur-sm rounded-lg p-3 cursor-pointer hover:bg-gray-600/50 transition-all border border-gray-600/30 hover:border-blue-500/30 group">
             <div className="flex justify-between items-center mb-2">
@@ -662,7 +661,7 @@ function LiveMatchItem({ team1, team2, score1, score2, overs }) {
 }
 
 // Enhanced Suggested User Component
-function SuggestedUser({ username, name, image, verified = false }) {
+function SuggestedUser({ username, name, image, verified = false }: { username: string, name: string, image: string, verified?: boolean }) {
     const [isFollowing, setIsFollowing] = useState(false)
 
     return (
