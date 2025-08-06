@@ -9,16 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
+    "cookies-next": "^6.1.0",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.12",
+    "next": "15.4.1",
+    "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.4.1"
+    "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0",
+    "socket.io-client": "^4.8.1",
+    "zod": "^4.0.10"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
