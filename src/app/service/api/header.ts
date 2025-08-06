@@ -1,15 +1,8 @@
 export const getOptions = {
   method: 'GET',
   headers: {
-    'x-rapidapi-key': '167bff128fmshc8e0860e5a259eap13aa99jsnbe9969814757',
-    'x-rapidapi-host': 'free-cricbuzz-cricket-api.p.rapidapi.com'
-  }
-};
-
-export const postOptions = {
-  method: 'POST',
-  headers: {
-    'x-rapidapi-key': '167bff128fmshc8e0860e5a259eap13aa99jsnbe9969814757',
-    'x-rapidapi-host': 'free-cricbuzz-cricket-api.p.rapidapi.com'
-  }
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true', // 👈 explicitly tell ngrok to skip
+    'User-Agent': 'vercel-fetch-client', // 👈 also works as alternative
+  },
 };
