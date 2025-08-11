@@ -66,3 +66,11 @@ body {
     background: rgba(156, 163, 175, 0.7);
   }
 }
+/* globals.css */
+iframe[width="728"][height="90"] {
+  position: absolute !important;
+  bottom: 0px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+}

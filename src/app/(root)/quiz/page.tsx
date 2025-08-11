@@ -72,11 +72,6 @@ export default function QuizPage() {
 
     const currentQuestion = questions[current];
 
-    const handleOptionClick = (option) => {
-        if (showFeedback) return;
-        setSelected(option);
-    };
-
     const handleNext = () => {
         if (!selected) return;
         if (selected === currentQuestion.answer) setScore((prev) => prev + 1);

@@ -7,47 +7,54 @@ import Navbar from './components/Navbar';
 import { getPlayersData } from './service/api/Players';
 import Link from 'next/link';
 import { getNewsData } from './service/api/News';
-import { getAuthToken } from './utils/cookies';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, Easing, Variants, easeInOut } from 'framer-motion';
 import ChatBot from './components/ChatBot';
+import Adbanner from './components/Adbanner';
+import NativeAdBanner from './components/NativeAdBanner';
 
 // Animation variants
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.8, ease: "easeOut" }
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
   }
 };
 
-const slideUp = {
+const slideUp: Variants = {
   hidden: { y: 30, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
     transition: {
       duration: 0.6,
-      ease: [0.16, 1, 0.3, 1]
+      ease: "easeOut"
     }
   }
 };
 
-const scaleUp = {
+const scaleUp: Variants = {
   hidden: { scale: 0.95, opacity: 0 },
   visible: {
     scale: 1,
     opacity: 1,
     transition: {
       duration: 0.5,
-      ease: "easeOut"
+      ease: [0.16, 1, 0.3, 1] as const
     }
   }
 };
 
-const cardHover = {
+const cardHover: Variants = {
   hover: {
     y: -5,
-    transition: { duration: 0.3, ease: "easeOut" }
+    transition: {
+      duration: 0.3,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
   }
 };
 
@@ -62,10 +69,10 @@ const staggerContainer = {
   }
 };
 
-const buttonHover = {
+const buttonHover: Variants = {
   hover: {
     scale: 1.03,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2, ease: easeInOut }
   },
   tap: {
     scale: 0.98
@@ -450,9 +457,10 @@ export default function Home() {
             </motion.div>
           </div>
           {/* ad banner here */}
-          <div className="absolute mt-16 w-full right-0 h-24 bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-            <iframe title='advertisement' src="https://www.profitableratecpm.com/pb9zgzagk?key=f15b1fc6b9effaccff8e1ae74578e79d" width="100%" height="100%"></iframe>
-          </div>
+          {/* <div className="absolute mt-16 w-full right-0 h-24 bg-gray-800 rounded-lg overflow-hidden shadow-lg"> */}
+          {/* <iframe title='advertisement' src="https://www.profitableratecpm.com/pb9zgzagk?key=f15b1fc6b9effaccff8e1ae74578e79d" width="100%" height="100%"></iframe> */}
+          <NativeAdBanner />
+          {/* </div> */}
         </div>
       </motion.section >
 
@@ -1139,6 +1147,8 @@ export default function Home() {
       <div>
         <ChatBot />
       </div>
+      <Adbanner />
+
     </div >
   );
 }

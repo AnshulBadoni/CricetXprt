@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, SendHorizontal } from "lucide-react";
 import { raiseQuery } from "../service/api/Support";
 
 export default function ChatBot() {
@@ -133,7 +133,8 @@ export default function ChatBot() {
                                 disabled={loading}
                                 className="px-4 bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Send
+                                {/* send message icon */}
+                                <SendHorizontal size={20} />
                             </button>
                         </div>
                     </div>
