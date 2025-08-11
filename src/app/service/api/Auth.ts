@@ -1,4 +1,5 @@
-const BASE_URL = 'http://194.238.18.204:5000/auth';
+// const BASE_URL = 'http://194.238.18.204:5000/auth';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5000/auth';
 
 export const signin = async ({ email, password }: { email: string, password: string }) => {
     const url = `${BASE_URL}/signin`;

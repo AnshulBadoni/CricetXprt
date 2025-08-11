@@ -7,7 +7,77 @@ import Navbar from './components/Navbar';
 import { getPlayersData } from './service/api/Players';
 import Link from 'next/link';
 import { getNewsData } from './service/api/News';
-import { getAuthToken } from './utils/cookies';
+import { motion, Easing, Variants, easeInOut } from 'framer-motion';
+import ChatBot from './components/ChatBot';
+import Adbanner from './components/Adbanner';
+import NativeAdBanner from './components/NativeAdBanner';
+
+// Animation variants
+const fadeIn: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
+  }
+};
+
+const slideUp: Variants = {
+  hidden: { y: 30, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
+
+const scaleUp: Variants = {
+  hidden: { scale: 0.95, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
+  }
+};
+
+const cardHover: Variants = {
+  hover: {
+    y: -5,
+    transition: {
+      duration: 0.3,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3
+    }
+  }
+};
+
+const buttonHover: Variants = {
+  hover: {
+    scale: 1.03,
+    transition: { duration: 0.2, ease: easeInOut }
+  },
+  tap: {
+    scale: 0.98
+  }
+};
 
 export default function Home() {
   const [heroMatch, setHeroMatch] = useState<any>(null);
@@ -17,13 +87,13 @@ export default function Home() {
   const [topPlayers, setTopPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [recentMatches, setRecentMatches] = useState<any[]>([]);
+
   useEffect(() => {
     fetchAllData();
   }, []);
 
   const fetchAllData = async () => {
     setIsLoading(true);
-
     try {
       const [
         featuredMatch,
@@ -55,27 +125,40 @@ export default function Home() {
     }
   };
 
-
   const TeamLogo = ({ team, className = "" }: { team: any, className?: string }) => (
-    <div className={`flex items-center justify-center rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 shadow-inner ${className}`}>
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`flex items-center justify-center rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 shadow-inner ${className}`}
+    >
       {team.logo ? (
-        <img src={team.logo} alt={team.short} className="w-full h-full object-contain" onError={(e: any) => {
-          e.target.onerror = null;
-          e.target.src = team.fallback ? team.fallback : '/flags/fallback.png';
-        }} />
+        <img
+          src={team.logo}
+          alt={team.short}
+          className="w-full h-full object-contain"
+          onError={(e: any) => {
+            e.target.onerror = null;
+            e.target.src = team.fallback ? team.fallback : '/flags/fallback.png';
+          }}
+        />
       ) : (
         <span className="text-xs font-bold">{team.fallback}</span>
       )}
-    </div>
+    </motion.div>
   );
 
   const PlayerImage = ({ player, className = "" }: { player: any, className?: string }) => (
     <div className={`relative rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 overflow-hidden ${className}`}>
       {player.image ? (
-        <img src={player.image} alt={player.name} className="w-full h-full object-cover" onError={(e: any) => {
-          e.target.onerror = null;
-          e.target.src = player.fallback ? player.fallback : '/user.png';
-        }} />
+        <img
+          src={player.image}
+          alt={player.name}
+          className="w-full h-full object-cover"
+          onError={(e: any) => {
+            e.target.onerror = null;
+            e.target.src = player.fallback ? player.fallback : '/user.png';
+          }}
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-neutral-800">
           <span className="text-xs font-bold">{player.name.split(' ').map((n: string) => n[0]).join('')}</span>
@@ -105,12 +188,22 @@ export default function Home() {
         <meta name="description" content="Premium cricket betting and live scores platform" />
       </Head>
 
-      {/* Top Navigation */}
-      <Navbar />
+      {/* Animated Navbar */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Navbar />
+      </motion.div>
 
       {/* Hero Section */}
-      <section className="relative isolate overflow-hidden bg-gray-900 min-h-screen flex items-center">
-        {/* Background elements remain the same */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+        className="relative isolate overflow-hidden bg-gray-900 min-h-screen flex items-center"
+      >
         <div className="absolute inset-0 z-0">
           <video
             autoPlay
@@ -126,21 +219,45 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900/0 via-gray-900/70 to-gray-900/100"></div>
         </div>
 
-
-        {/* Animated glow elements */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-1/3 -right-20 w-96 h-96 mt-96 rounded-full bg-indigo-600/10 blur-3xl animate-pulse-slow delay-2000"></div>
-
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full">
           <div className="flex flex-col lg:flex-row items-center gap-16 pt-40 lg:pt-0">
-            {/* Left Content - Text (unchanged) */}
-            <div className="lg:w-1/2 text-center lg:text-left">
+            {/* Left Content - Text */}
+            <motion.div
+              variants={slideUp}
+              className="lg:w-1/2 text-center lg:text-left"
+            >
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white">
-                <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
+                <motion.span
+                  className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent"
+                  animate={{
+                    backgroundPosition: ['0% 50%', '100% 50%'],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "linear"
+                  }}
+                  style={{
+                    backgroundSize: '200% 200%'
+                  }}
+                >
                   Cricket
-                </span>
+                </motion.span>
                 <br />
-                <span className="text-white">Expert Platf<img src="/ball.png" alt="o" className="w-16 inline-block -mx-[10px]" />rm</span>
+                <span className="text-white">Expert Platf<motion.img
+                  src="/ball.png"
+                  alt="o"
+                  className="w-16 inline-block -mx-[10px]"
+                  animate={{
+                    rotate: 360,
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />rm</span>
               </h1>
 
               <p className="mt-6 text-xl leading-8 text-gray-300 max-w-2xl">
@@ -150,7 +267,12 @@ export default function Home() {
 
               <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
                 <Link href="/sign-in">
-                  <button className="relative overflow-hidden group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl font-semibold text-white shadow-2xl shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1">
+                  <motion.button
+                    variants={buttonHover}
+                    whileHover="hover"
+                    whileTap="tap"
+                    className="relative overflow-hidden group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl font-semibold text-white shadow-2xl shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
+                  >
                     <span className="relative z-10 flex items-center gap-2">
                       Join Community
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
@@ -158,106 +280,202 @@ export default function Home() {
                       </svg>
                     </span>
                     <span className="absolute inset-0 bg-gradient-to-r from-blue-700 to-indigo-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  </button>
+                  </motion.button>
                 </Link>
-                {/* 
-                <button className="flex items-center gap-2 px-6 py-3.5 text-white font-medium hover:text-blue-300 transition-all group">
-                  <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                      <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  Watch Demo
-                </button> */}
               </div>
-            </div>
+            </motion.div>
 
-            {/* Right Content - No Live Match State */}
-            <div className="lg:w-1/2 w-full max-w-2xl mt-0">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.01] duration-500">
+            {/* Right Content - Match Card */}
+            <motion.div
+              variants={slideUp}
+              transition={{ delay: 0.2 }}
+              className="lg:w-1/2 w-full max-w-2xl mt-0"
+            >
+              <motion.div
+                variants={cardHover}
+                whileHover="hover"
+                className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-500"
+              >
                 <div className="relative z-10 bg-gradient-to-b from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
                   {/* Header */}
                   <div className="bg-gradient-to-r from-gray-800 to-gray-850 px-6 py-4 flex items-center justify-between border-b border-gray-700/50">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">No Live Matches</span>
+                        <motion.span
+                          className="text-xs font-semibold text-blue-400 uppercase tracking-wider"
+                          animate={{
+                            opacity: [0.8, 1, 0.8],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity
+                          }}
+                        >
+                          {heroMatch ? "Live Now" : "Upcoming Matches"}
+                        </motion.span>
                       </div>
-                      <h3 className="text-xl font-bold text-white mt-1">Upcoming Cricket Action</h3>
+                      <h3 className="text-xl font-bold text-white mt-1">
+                        {heroMatch ? "Live Cricket Action" : "Upcoming Cricket Action"}
+                      </h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-400">Coming Soon</span>
+                      <span className="text-sm font-medium text-gray-400">
+                        {heroMatch ? "In Progress" : "Coming Soon"}
+                      </span>
                     </div>
                   </div>
 
                   {/* Content */}
                   <div className="p-6 text-center">
-                    <div className="flex justify-center mb-6">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-
-                    <h4 className="text-lg font-bold text-white mb-3">No Live Matches Currently</h4>
-                    <p className="text-gray-400 mb-6">
-                      There are no live matches happening right now. Check out upcoming matches or explore our cricket content.
-                    </p>
-                    {upcomingMatches?.[0]?.matchList?.[0] && (
-                      <div className="mb-6">
-                        <p className="text-sm text-gray-400 mb-2">Next Match:</p>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-400">
-                              {upcomingMatches[0].seriesName}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {upcomingMatches[0].matchList[0].matchDate} •
-                              {upcomingMatches[0].matchList[0].matchTime.trim()}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <TeamLogo
-                                team={{
-                                  short: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0],
-                                  name: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0]
-                                }}
-                                className="w-8 h-8 mr-3"
-                              />
-                              <span>{upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0]}</span>
-                            </div>
-                            <div className="text-xs bg-gray-700 px-2 py-1 rounded-full">VS</div>
-                            <div className="flex items-center">
-                              <span>{upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1]}</span>
-                              <TeamLogo
-                                team={{
-                                  short: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1],
-                                  name: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1]
-                                }}
-                                className="w-8 h-8 ml-3"
-                              />
+                    {heroMatch ? (
+                      <>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center">
+                            <TeamLogo
+                              team={{
+                                name: heroMatch.team_b,
+                                short: heroMatch.team_b_short,
+                                logo: heroMatch.team_b_img
+                              }}
+                              className="w-10 h-10 mr-3"
+                            />
+                            <div>
+                              <div className="font-medium group-hover:text-blue-300 transition-colors">
+                                {heroMatch.team_b_short}
+                              </div>
+                              <div className="text-xs text-neutral-400">
+                                {heroMatch.team_b_scores}
+                              </div>
                             </div>
                           </div>
-                          <div className="mt-2 text-xs text-gray-400">
-                            {upcomingMatches[0].matchList[0].matchFormat} • {upcomingMatches[0].matchList[0].matchVenue}
+                          <div className="text-sm bg-neutral-800 px-3 py-1 rounded-full">VS</div>
+                          <div className="flex items-center">
+                            <div>
+                              <div className="font-medium text-right group-hover:text-indigo-300 transition-colors">
+                                {heroMatch.team_a_short}
+                              </div>
+                              <div className="text-xs text-neutral-400 text-right">
+                                {heroMatch.team_a_scores || 'Yet to bat'}
+                              </div>
+                            </div>
+                            <TeamLogo
+                              team={{
+                                name: heroMatch.team_a,
+                                short: heroMatch.team_a_short,
+                                logo: heroMatch.team_a_img
+                              }}
+                              className="w-10 h-10 ml-3"
+                            />
                           </div>
                         </div>
-                      </div>
+                        <div className="text-center text-sm mb-4">
+                          <div className="font-bold">{heroMatch.team_b_scores} vs {heroMatch.team_a_scores || '0/0'}</div>
+                          <div className="text-xs text-neutral-400 mt-1">{heroMatch.match_status}</div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="text-xs text-neutral-400">
+                            Match Winner • Top Batsman
+                          </div>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="text-xs bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity"
+                          >
+                            Bet Now
+                          </motion.button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-center mb-6">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+
+                        <h4 className="text-lg font-bold text-white mb-3">No Live Matches Currently</h4>
+                        <p className="text-gray-400 mb-6">
+                          There are no live matches happening right now. Check out upcoming matches or explore our cricket content.
+                        </p>
+                        {upcomingMatches?.[0]?.matchList?.[0] && (
+                          <div className="mb-6">
+                            <p className="text-sm text-gray-400 mb-2">Next Match:</p>
+                            <motion.div
+                              whileHover={{ y: -3 }}
+                              className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30"
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs text-gray-400">
+                                  {upcomingMatches[0].seriesName}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {upcomingMatches[0].matchList[0].matchDate} •
+                                  {upcomingMatches[0].matchList[0].matchTime.trim()}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <TeamLogo
+                                    team={{
+                                      short: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0],
+                                      name: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0]
+                                    }}
+                                    className="w-8 h-8 mr-3"
+                                  />
+                                  <span>{upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[0]}</span>
+                                </div>
+                                <div className="text-xs bg-gray-700 px-2 py-1 rounded-full">VS</div>
+                                <div className="flex items-center">
+                                  <span>{upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1]}</span>
+                                  <TeamLogo
+                                    team={{
+                                      short: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1],
+                                      name: upcomingMatches[0].matchList[0].matchTitle.split(' vs ')[1]
+                                    }}
+                                    className="w-8 h-8 ml-3"
+                                  />
+                                </div>
+                              </div>
+                              <div className="mt-2 text-xs text-gray-400">
+                                {upcomingMatches[0].matchList[0].matchFormat} • {upcomingMatches[0].matchList[0].matchVenue}
+                              </div>
+                            </motion.div>
+                          </div>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                        >
+                          View Upcoming Matches
+                        </motion.button>
+                      </>
                     )}
-                    <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
-                      View Upcoming Matches
-                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
+          {/* ad banner here */}
+          {/* <div className="absolute mt-16 w-full right-0 h-24 bg-gray-800 rounded-lg overflow-hidden shadow-lg"> */}
+          {/* <iframe title='advertisement' src="https://www.profitableratecpm.com/pb9zgzagk?key=f15b1fc6b9effaccff8e1ae74578e79d" width="100%" height="100%"></iframe> */}
+          <NativeAdBanner />
+          {/* </div> */}
         </div>
-      </section>
+      </motion.section >
+
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Featured Matches - Card Style */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+      < main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8" >
+        {/* Featured Matches */}
+        < motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }
+          }
+          variants={fadeIn}
+          className="mb-12"
+        >
+          <motion.div variants={slideUp} className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Featured Matches</h2>
             <button className="text-sm text-neutral-400 hover:text-white flex items-center">
               View All
@@ -265,83 +483,109 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {heroMatch ? (
-              <Link href={`/matches/${heroMatch.match_id}`} className="block">
-                <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden hover:border-blue-500/30 transition-colors group shadow-lg">
-                  <div className="p-4 border-b border-neutral-800 flex justify-between items-center bg-gradient-to-r from-neutral-900 to-neutral-800">
-                    <div className="text-xs text-neutral-400">{heroMatch.series}</div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full flex items-center">
-                        <span className="w-2 h-2 rounded-full bg-red-400 mr-1 animate-pulse"></span>
-                        LIVE
-                      </span>
+              <motion.div variants={slideUp}>
+                <Link href={`/matches/${heroMatch.match_id}`} className="block">
+                  <motion.div
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden hover:border-blue-500/30 transition-colors group shadow-lg"
+                  >
+                    <div className="p-4 border-b border-neutral-800 flex justify-between items-center bg-gradient-to-r from-neutral-900 to-neutral-800">
+                      <div className="text-xs text-neutral-400">{heroMatch.series}</div>
+                      <div className="flex items-center space-x-2">
+                        <motion.span
+                          animate={{ opacity: [0.6, 1, 0.6] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full flex items-center"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-red-400 mr-1"></span>
+                          LIVE
+                        </motion.span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center">
-                        <TeamLogo team={{ name: heroMatch.team_b, short: heroMatch.team_b_short, logo: heroMatch.team_b_img }} className="w-10 h-10 mr-3" />
-                        <div>
-                          <div className="font-medium group-hover:text-blue-300 transition-colors">{heroMatch.team_b_short}</div>
-                          <div className="text-xs text-neutral-400">{heroMatch.team_b_scores}</div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <TeamLogo team={{ name: heroMatch.team_b, short: heroMatch.team_b_short, logo: heroMatch.team_b_img }} className="w-10 h-10 mr-3" />
+                          <div>
+                            <div className="font-medium group-hover:text-blue-300 transition-colors">{heroMatch.team_b_short}</div>
+                            <div className="text-xs text-neutral-400">{heroMatch.team_b_scores}</div>
+                          </div>
+                        </div>
+                        <div className="text-sm bg-neutral-800 px-3 py-1 rounded-full">VS</div>
+                        <div className="flex items-center">
+                          <div>
+                            <div className="font-medium text-right group-hover:text-indigo-300 transition-colors">{heroMatch.team_a_short}</div>
+                            <div className="text-xs text-neutral-400 text-right">{heroMatch.team_a_scores || 'Yet to bat'}</div>
+                          </div>
+                          <TeamLogo team={{ name: heroMatch.team_a, short: heroMatch.team_a_short, logo: heroMatch.team_a_img }} className="w-10 h-10 ml-3" />
                         </div>
                       </div>
-                      <div className="text-sm bg-neutral-800 px-3 py-1 rounded-full">VS</div>
-                      <div className="flex items-center">
-                        <div>
-                          <div className="font-medium text-right group-hover:text-indigo-300 transition-colors">{heroMatch.team_a_short}</div>
-                          <div className="text-xs text-neutral-400 text-right">{heroMatch.team_a_scores || 'Yet to bat'}</div>
+                      <div className="text-center text-sm mb-4">
+                        <div className="font-bold">{heroMatch.team_b_scores} vs {heroMatch.team_a_scores || '0/0'}</div>
+                        <div className="text-xs text-neutral-400 mt-1">{heroMatch.match_status}</div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs text-neutral-400">
+                          Match Winner • Top Batsman
                         </div>
-                        <TeamLogo team={{ name: heroMatch.team_a, short: heroMatch.team_a_short, logo: heroMatch.team_a_img }} className="w-10 h-10 ml-3" />
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="text-xs bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity"
+                        >
+                          Bet Now
+                        </motion.button>
                       </div>
                     </div>
-                    <div className="text-center text-sm mb-4">
-                      <div className="font-bold">{heroMatch.team_b_scores} vs {heroMatch.team_a_scores || '0/0'}</div>
-                      <div className="text-xs text-neutral-400 mt-1">{heroMatch.match_status}</div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs text-neutral-400">
-                        Match Winner • Top Batsman
+                    <div className="px-4 pb-4">
+                      <div className="flex justify-between">
+                        <button className="flex-1 mr-2 bg-neutral-800/50 hover:bg-neutral-700/50 text-white py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
+                          {heroMatch.min_rate.toFixed(2)}
+                        </button>
+                        <button className="flex-1 ml-2 bg-neutral-800/50 hover:bg-neutral-700/50 text-white py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
+                          {heroMatch.max_rate.toFixed(2)}
+                        </button>
                       </div>
-                      <button className="text-xs bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity">
-                        Bet Now
-                      </button>
                     </div>
-                  </div>
-                  <div className="px-4 pb-4">
-                    <div className="flex justify-between">
-                      <button className="flex-1 mr-2 bg-neutral-800/50 hover:bg-neutral-700/50 text-white py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
-                        {heroMatch.min_rate.toFixed(2)}
-                      </button>
-                      <button className="flex-1 ml-2 bg-neutral-800/50 hover:bg-neutral-700/50 text-white py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
-                        {heroMatch.max_rate.toFixed(2)}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                  </motion.div>
+                </Link>
+              </motion.div>
             ) : (
-              <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden p-8 flex justify-center items-center h-64">
+              <motion.div
+                variants={slideUp}
+                className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden p-8 flex justify-center items-center h-64"
+              >
                 <div className="text-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p className="text-gray-400">No featured matches available</p>
                 </div>
-              </div>
+              </motion.div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div >
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Recent Matches & News */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Recent Matches Table */}
-            <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg">
-              <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
+        < div className="grid grid-cols-1 lg:grid-cols-3 gap-8" >
+          {/* Left Column */}
+          < div className="lg:col-span-2 space-y-8" >
+            {/* Recent Matches */}
+            < motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg"
+            >
+              <motion.div variants={slideUp} className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
                 <h2 className="text-xl font-bold flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -354,62 +598,82 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-              </div>
-              {isLoading ? (
-                <div className="p-8 flex justify-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                </div>
-              ) : recentMatches?.length > 0 ? (
-                <div className="divide-y divide-neutral-800 px-5">
-                  {recentMatches.slice(0, 5).map((series: any) => (
-                    series.matchList.slice(0, 2).map((match: any) => (
-                      <Link href={`/matches/${match.matchId}`} key={match.matchId} className="p-4 hover:bg-neutral-800/30 transition duration-150 group">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs text-neutral-400">{series.seriesName}</span>
-                          <span className="text-xs text-neutral-400">{match.matchDate}</span>
-                        </div>
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center w-2/5">
-                            <div className="w-8 h-8 rounded-full bg-neutral-800 mr-3 flex items-center justify-center">
-                              <span className="text-xs">{match.teamOne.name?.substring(0, 2) || 'T1'}</span>
-                            </div>
-                            <div>
-                              <div className="font-medium group-hover:text-blue-300 transition-colors">
-                                {match.teamOne.name || 'Team 1'}
-                              </div>
-                              <div className="text-xs text-neutral-400">{match.teamOne.score || '-'}</div>
-                            </div>
-                          </div>
-                          <div className="w-1/5 text-center px-2">
-                            <div className="text-xs bg-neutral-800 px-2 py-1 rounded-full">VS</div>
-                            <div className="text-xs text-neutral-400 mt-1">{match.matchStatus}</div>
-                          </div>
-                          <div className="flex items-center justify-end w-2/5">
-                            <div className="text-right">
-                              <div className="font-medium group-hover:text-indigo-300 transition-colors">
-                                {match.teamTwo.name || 'Team 2'}
-                              </div>
-                              <div className="text-xs text-neutral-400">{match.teamTwo.score || '-'}</div>
-                            </div>
-                            <div className="w-8 h-8 rounded-full bg-neutral-800 ml-3 flex items-center justify-center">
-                              <span className="text-xs">{match.teamTwo.name?.substring(0, 2) || 'T2'}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center text-gray-400">
-                  No recent matches available
-                </div>
-              )}
-            </div>
+              </motion.div>
 
-            {/* Cricket News Section - Card Grid */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
+              {
+                isLoading ? (
+                  <motion.div variants={slideUp} className="p-8 flex justify-center">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"
+                    ></motion.div>
+                  </motion.div>
+                ) : recentMatches?.length > 0 ? (
+                  <motion.div
+                    variants={staggerContainer}
+                    className="divide-y divide-neutral-800 px-5"
+                  >
+                    {recentMatches.slice(0, 5).map((series: any) => (
+                      series.matchList.slice(0, 2).map((match: any) => (
+                        <motion.div
+                          key={match.matchId}
+                          variants={slideUp}
+                        >
+                          <Link href={`/matches/${match.matchId}`} className="p-4 hover:bg-neutral-800/30 transition duration-150 group block">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-xs text-neutral-400">{series.seriesName}</span>
+                              <span className="text-xs text-neutral-400">{match.matchDate}</span>
+                            </div>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center w-2/5">
+                                <div className="w-8 h-8 rounded-full bg-neutral-800 mr-3 flex items-center justify-center">
+                                  <span className="text-xs">{match.teamOne.name?.substring(0, 2) || 'T1'}</span>
+                                </div>
+                                <div>
+                                  <div className="font-medium group-hover:text-blue-300 transition-colors">
+                                    {match.teamOne.name || 'Team 1'}
+                                  </div>
+                                  <div className="text-xs text-neutral-400">{match.teamOne.score || '-'}</div>
+                                </div>
+                              </div>
+                              <div className="w-1/5 text-center px-2">
+                                <div className="text-xs bg-neutral-800 px-2 py-1 rounded-full">VS</div>
+                                <div className="text-xs text-neutral-400 mt-1">{match.matchStatus}</div>
+                              </div>
+                              <div className="flex items-center justify-end w-2/5">
+                                <div className="text-right">
+                                  <div className="font-medium group-hover:text-indigo-300 transition-colors">
+                                    {match.teamTwo.name || 'Team 2'}
+                                  </div>
+                                  <div className="text-xs text-neutral-400">{match.teamTwo.score || '-'}</div>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-neutral-800 ml-3 flex items-center justify-center">
+                                  <span className="text-xs">{match.teamTwo.name?.substring(0, 2) || 'T2'}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div variants={slideUp} className="p-8 text-center text-gray-400">
+                    No recent matches available
+                  </motion.div>
+                )
+              }
+            </motion.div >
+
+            {/* News Section */}
+            < motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+            >
+              <motion.div variants={slideUp} className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Cricket News & Highlights</h2>
                 <Link href="/news" className="text-sm text-neutral-400 hover:text-white flex items-center">
                   View All
@@ -417,10 +681,19 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              </motion.div>
+
+              <motion.div
+                variants={staggerContainer}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+              >
                 {news.slice(0, 4).map((item: any, index: number) => (
-                  <div key={index} className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden hover:border-blue-500/30 transition-colors group shadow-lg">
+                  <motion.div
+                    key={index}
+                    variants={slideUp}
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden hover:border-blue-500/30 transition-colors group shadow-lg"
+                  >
                     <div className="relative h-48 bg-gradient-to-br from-neutral-800 to-neutral-900 overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 to-transparent z-10"></div>
                       <NewsImage item={item} className="w-full h-full" />
@@ -441,18 +714,24 @@ export default function Home() {
                         </svg>
                       </a>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
               <Slider items={news.slice(4, 7)} />
-            </div>
-          </div>
+            </motion.div >
+          </div >
 
           {/* Right Column */}
-          <div className="space-y-8">
+          < div className="space-y-8" >
             {/* Upcoming Matches */}
-            <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg">
-              <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
+            < motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg"
+            >
+              <motion.div variants={slideUp} className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
                 <h2 className="text-xl font-bold">Upcoming Matches</h2>
                 <button className="text-sm text-neutral-400 hover:text-white flex items-center">
                   View All
@@ -460,72 +739,101 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-              </div>
-              {isLoading ? (
-                <div className="p-8 flex justify-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
-                </div>
-              ) : upcomingMatches?.length > 0 ? (
-                <div className="divide-y divide-neutral-800">
-                  {upcomingMatches.slice(0, 5).map((series: any) => (
-                    series.matchList.slice(0, 2).map((match: any) => (
-                      <Link key={match.matchId} href={`/matches/${match.matchId}`}>
-                        <div key={match.matchId} className="p-4 hover:bg-neutral-800/30 transition duration-150 group">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs text-neutral-400">{series.seriesName}</span>
-                            <span className="text-xs text-neutral-400">{match.matchDate} • {match.matchTime}</span>
-                          </div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 rounded-full bg-neutral-800 mr-3 flex items-center justify-center">
-                                <span className="text-xs">
-                                  {match.matchTitle.split(' vs ')[0].split(' ').map((w: any) => w[0]).join('')}
-                                </span>
-                              </div>
-                              <span className="group-hover:text-blue-300 transition-colors">
-                                {match.matchTitle.split(' vs ')[0]}
-                              </span>
-                            </div>
-                            <div className="text-xs bg-neutral-800 px-2 py-1 rounded-full">VS</div>
-                            <div className="flex items-center">
-                              <span className="group-hover:text-indigo-300 transition-colors">
-                                {match.matchTitle.split(' vs ')[1]}
-                              </span>
-                              <div className="w-8 h-8 rounded-full bg-neutral-800 ml-3 flex items-center justify-center">
-                                <span className="text-xs">
-                                  {match.matchTitle.split(' vs ')[1].split(' ').map((w: any) => w[0]).join('')}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <div className="text-xs text-neutral-400">
-                              {match.matchFormat}
-                            </div>
-                            <div className="flex space-x-2">
-                              <button className="text-xs bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-blue-500/30 hover:border-blue-500/50 px-3 py-1 rounded-full transition-colors">
-                                1.85
-                              </button>
-                              <button className="text-xs bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-indigo-500/30 hover:border-indigo-500/50 px-3 py-1 rounded-full transition-colors">
-                                2.10
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center text-gray-400">
-                  No upcoming matches scheduled
-                </div>
-              )}
-            </div>
+              </motion.div>
 
-            {/* Top Players - Card Style */}
-            <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg">
-              <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
+              {
+                isLoading ? (
+                  <motion.div variants={slideUp} className="p-8 flex justify-center">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"
+                    ></motion.div>
+                  </motion.div>
+                ) : upcomingMatches?.length > 0 ? (
+                  <motion.div
+                    variants={staggerContainer}
+                    className="divide-y divide-neutral-800"
+                  >
+                    {upcomingMatches.slice(0, 5).map((series: any) => (
+                      series.matchList.slice(0, 2).map((match: any) => (
+                        <motion.div
+                          key={match.matchId}
+                          variants={slideUp}
+                        >
+                          <Link href={`/matches/${match.matchId}`}>
+                            <div className="p-4 hover:bg-neutral-800/30 transition duration-150 group">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="text-xs text-neutral-400">{series.seriesName}</span>
+                                <span className="text-xs text-neutral-400">{match.matchDate} • {match.matchTime}</span>
+                              </div>
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center">
+                                  <div className="w-8 h-8 rounded-full bg-neutral-800 mr-3 flex items-center justify-center">
+                                    <span className="text-xs">
+                                      {match.matchTitle.split(' vs ')[0].split(' ').map((w: any) => w[0]).join('')}
+                                    </span>
+                                  </div>
+                                  <span className="group-hover:text-blue-300 transition-colors">
+                                    {match.matchTitle.split(' vs ')[0]}
+                                  </span>
+                                </div>
+                                <div className="text-xs bg-neutral-800 px-2 py-1 rounded-full">VS</div>
+                                <div className="flex items-center">
+                                  <span className="group-hover:text-indigo-300 transition-colors">
+                                    {match.matchTitle.split(' vs ')[1]}
+                                  </span>
+                                  <div className="w-8 h-8 rounded-full bg-neutral-800 ml-3 flex items-center justify-center">
+                                    <span className="text-xs">
+                                      {match.matchTitle.split(' vs ')[1].split(' ').map((w: any) => w[0]).join('')}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <div className="text-xs text-neutral-400">
+                                  {match.matchFormat}
+                                </div>
+                                <div className="flex space-x-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="text-xs bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-blue-500/30 hover:border-blue-500/50 px-3 py-1 rounded-full transition-colors"
+                                  >
+                                    1.85
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="text-xs bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border border-indigo-500/30 hover:border-indigo-500/50 px-3 py-1 rounded-full transition-colors"
+                                  >
+                                    2.10
+                                  </motion.button>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div variants={slideUp} className="p-8 text-center text-gray-400">
+                    No upcoming matches scheduled
+                  </motion.div>
+                )
+              }
+            </motion.div >
+
+            {/* Top Players */}
+            < motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg"
+            >
+              <motion.div variants={slideUp} className="flex items-center justify-between p-4 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800">
                 <h2 className="text-xl font-bold">Top Tournament Players</h2>
                 <button className="text-sm text-neutral-400 hover:text-white flex items-center">
                   View All
@@ -533,10 +841,19 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-              </div>
-              <div className="divide-y divide-neutral-800">
-                {topPlayers?.length > 0 && topPlayers.slice(0, 10).map((player: any) => (
-                  <div key={player.id} className="p-4 hover:bg-neutral-800/30 transition duration-150 group">
+              </motion.div>
+
+              <motion.div
+                variants={staggerContainer}
+                className="divide-y divide-neutral-800"
+              >
+                {topPlayers?.length > 0 && topPlayers.slice(0, 10).map((player: any, index: number) => (
+                  <motion.div
+                    key={player.id}
+                    variants={slideUp}
+                    whileHover={{ x: 5 }}
+                    className="p-4 hover:bg-neutral-800/30 transition duration-150 group"
+                  >
                     <div className="flex items-center">
                       <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 overflow-hidden mr-3">
                         <img
@@ -573,30 +890,45 @@ export default function Home() {
                     </div>
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex space-x-1">
-                        {/* Since we don't have form data in the API, we'll show some placeholder indicators */}
                         {[1, 2, 3, 4, 5].map((_, idx) => (
-                          <div
+                          <motion.div
                             key={idx}
+                            animate={{
+                              height: [`${Math.random() * 10 + 5}px`, `${Math.random() * 15 + 10}px`],
+                              opacity: [0.7, 1]
+                            }}
+                            transition={{
+                              duration: 1 + Math.random(),
+                              repeat: Infinity,
+                              repeatType: "reverse"
+                            }}
                             className="w-4 rounded-sm bg-gradient-to-b from-blue-500 to-indigo-500 flex items-center justify-center text-[8px] font-bold"
-                            style={{ height: `${Math.min(20, 4 + (Math.random() * 15))}px` }}
                             title={`Recent performance ${idx + 1}`}
-                          ></div>
+                          ></motion.div>
                         ))}
                       </div>
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         className="text-xs bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 rounded-full hover:opacity-90 transition-opacity"
                         onClick={() => window.open(`https://www.cricbuzz.com/profiles/${player.id}/${player.slug}`, '_blank')}
                       >
                         View Profile
-                      </button>
+                      </motion.button>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div >
 
             {/* Quick Bet Widget */}
-            <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg">
+            < motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={scaleUp}
+              className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl overflow-hidden shadow-lg"
+            >
               <div className="p-4 border-b border-neutral-800 bg-gradient-to-r from-blue-900/30 to-indigo-900/30">
                 <h2 className="text-xl font-bold">Place Quick Bet</h2>
               </div>
@@ -659,94 +991,141 @@ export default function Home() {
                     <span className="text-blue-400">$0.00</span>
                   </div>
                   <div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style={{ width: '0%' }}></div>
+                    <motion.div
+                      initial={{ width: '0%' }}
+                      whileInView={{ width: '70%' }}
+                      transition={{ duration: 1 }}
+                      viewport={{ once: true }}
+                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                    ></motion.div>
                   </div>
                 </div>
-                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center ">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center"
+                >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Place Bet
-                </button>
+                </motion.button>
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div >
+          </div >
+        </div >
 
         {/* Promotions Banner */}
-        <div className="mt-12 relative rounded-xl overflow-hidden shadow-2xl">
+        < motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={slideUp}
+          className="mt-12 relative rounded-xl overflow-hidden shadow-2xl"
+        >
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 z-10"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-950/90 z-10"></div>
           <div className="relative z-20 p-8 md:p-12">
             <div className="max-w-2xl">
               <div className="flex items-center mb-4">
-                <span className="text-xs font-bold bg-white text-blue-700 px-2 py-1 rounded-md mr-3">NEW</span>
+                <motion.span
+                  whileHover={{ scale: 1.1 }}
+                  className="text-xs font-bold bg-white text-blue-700 px-2 py-1 rounded-md mr-3"
+                >
+                  NEW
+                </motion.span>
                 <span className="text-sm text-white opacity-90">Limited Time Offer</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">100% Deposit Bonus Up To $1000</h2>
               <p className="text-neutral-200 mb-6 max-w-lg">New customers only. Min deposit $20. Wagering requirements apply.</p>
               <div className="flex flex-wrap gap-4">
-                <button className="px-6 py-2.5 bg-white text-blue-700 rounded-full font-medium hover:bg-opacity-90 transition-opacity flex items-center">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-6 py-2.5 bg-white text-blue-700 rounded-full font-medium hover:bg-opacity-90 transition-opacity flex items-center"
+                >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4H5z" />
                   </svg>
                   Claim Now
-                </button>
-                <button className="px-6 py-2.5 bg-transparent border-2 border-white text-white rounded-full font-medium hover:bg-white/10 transition-colors flex items-center">
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-6 py-2.5 bg-transparent border-2 border-white text-white rounded-full font-medium hover:bg-white/10 transition-colors flex items-center"
+                >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Terms & Conditions
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </motion.div >
+      </main >
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-neutral-900 to-neutral-950 border-t border-neutral-800 mt-12">
+      < motion.footer
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="bg-gradient-to-br from-neutral-900 to-neutral-950 border-t border-neutral-800 mt-12"
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Cricket Expert</h3>
               <p className="text-sm text-neutral-400 mb-4">The premier destination for cricket betting enthusiasts with live scores, streaming, and instant payouts.</p>
               <div className="flex space-x-4">
-                <a href="#" className="text-neutral-400 hover:text-white transition-colors">
+                <motion.a
+                  whileHover={{ y: -3 }}
+                  href="#"
+                  className="text-neutral-400 hover:text-white transition-colors"
+                >
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
                   </svg>
-                </a>
-                <a href="#" className="text-neutral-400 hover:text-white transition-colors">
+                </motion.a>
+                <motion.a
+                  whileHover={{ y: -3 }}
+                  href="#"
+                  className="text-neutral-400 hover:text-white transition-colors"
+                >
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
-                </a>
-                <a href="#" className="text-neutral-400 hover:text-white transition-colors">
+                </motion.a>
+                <motion.a
+                  whileHover={{ y: -3 }}
+                  href="#"
+                  className="text-neutral-400 hover:text-white transition-colors"
+                >
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                   </svg>
-                </a>
+                </motion.a>
               </div>
             </div>
             <div>
               <h3 className="text-md font-bold mb-4 text-neutral-300">Sports</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Cricket</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Football</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Tennis</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Basketball</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Esports</a></li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Cricket</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Football</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Tennis</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Basketball</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Esports</a></motion.li>
               </ul>
             </div>
             <div>
               <h3 className="text-md font-bold mb-4 text-neutral-300">Legal</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Terms & Conditions</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Responsible Gambling</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">AML Policy</a></li>
-                <li><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Contact Us</a></li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Terms & Conditions</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Privacy Policy</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Responsible Gambling</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">AML Policy</a></motion.li>
+                <motion.li whileHover={{ x: 3 }}><a href="#" className="text-sm text-neutral-400 hover:text-white transition-colors">Contact Us</a></motion.li>
               </ul>
             </div>
           </div>
@@ -761,17 +1140,15 @@ export default function Home() {
                 </svg>
                 18+ Only. Gambling Responsibly
               </div>
-              {/* <div className="flex flex-wrap justify-center gap-2">
-                <img src="/payment/visa.svg" className="h-6" alt="Visa" />
-                <img src="/payment/mastercard.svg" className="h-6" alt="Mastercard" />
-                <img src="/payment/skrill.svg" className="h-6" alt="Skrill" />
-                <img src="/payment/neteller.svg" className="h-6" alt="Neteller" />
-                <img src="/payment/bitcoin.svg" className="h-6" alt="Bitcoin" />
-              </div> */}
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+      </motion.footer >
+      <div>
+        <ChatBot />
+      </div>
+      <Adbanner />
+
+    </div >
   );
 }

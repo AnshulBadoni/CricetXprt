@@ -23,8 +23,8 @@ const Navbar = () => {
 
                     {/* Desktop Navigation - Clean Lines */}
                     <div className="hidden lg:flex items-center space-x-1">
-                        <NavLink href="#" text="Live" icon="🟢" active />
-                        <NavLink href="#" text="Matches" icon="" />
+                        <NavLink href="/" text="Live" icon="🟢" active />
+                        <NavLink href="/matches" text="Matches" icon="" />
                         <NavLink href="/news" text="News" icon="" />
                         <NavLink href="#" text="Teams" icon="" />
                         {/* <div className="w-px h-6 bg-gray-700 mx-8"></div>
