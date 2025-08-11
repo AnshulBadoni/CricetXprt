@@ -85,3 +85,26 @@ export interface ScoreboardResponse {
         secondInnings: Innings
     }
 }
+
+
+export interface User {
+    _id: string;
+    username: string;
+    avatar?: string;
+}
+
+export interface Comment {
+    user: User;
+    text: string;
+}
+
+export interface Post {
+    _id: string;
+    user: User;
+    content: string;
+    mediaUrl?: string;
+    mediaType?: "image" | "video";
+    sportType?: string;
+    description?: string;
+    comments?: Comment[];
+}
